@@ -19,10 +19,11 @@ services:
     ports:
       - "3307:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: ROOT
+      MYSQL_ROOT_PASSWORD: 653rag9T
       MYSQL_DATABASE: videgrenierenligne
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./sql/import.sql:/docker-entrypoint-initdb.d/import.sql
 
 volumes:
   mysql_data:
