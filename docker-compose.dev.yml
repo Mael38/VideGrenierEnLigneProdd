@@ -8,8 +8,11 @@ services:
       - "8080:80"
     volumes:
       - ./:/var/www/html
+      - ./public:/var/www/html/public
     environment:
       - APACHE_DOCUMENT_ROOT=/var/www/html/public
+      - PHP_INI_DIR=/usr/local/etc/php
+    restart: always
     depends_on:
       - db
 

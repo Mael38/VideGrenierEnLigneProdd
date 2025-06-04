@@ -31,6 +31,15 @@ RUN composer dump-autoload --optimize
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
-RUN sed -i -e 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
+RUN sed -i -e 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
+    && echo "DocumentRoot /var/www/html/public" >> /etc/apache2/apache2.conf \
+    && echo "<Directory /var/www/html/public>" >> /etc/apache2/apache2.conf \
+    && echo "    AllowOverride All" >> /etc/apache2/apache2.conf \
+    && echo "    Require all granted" >> /etc/apache2/apache2.conf \
+    && echo "</Directory>" >> /etc/apache2/apache2.conf
+
+RUN mkdir -p /var/www/html/public/storage \
+    && chown -R www-data:www-data /var/www/html/public/storage \
+    && chmod -R 755 /var/www/html/public/storage
 
 EXPOSE 80
