@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "watch": "node-sass -w style -o public/style",
+    "build-css": "sass style/main.scss public/css/style.css --style=expanded",
+    "build-css-prod": "sass style/main.scss public/css/style.css --style=compressed",
+    "watch-css": "sass style/main.scss public/css/style.css --watch --style=expanded",
+    "fix-scss": "node fix-scss.bat",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
