@@ -142,6 +142,9 @@
       text-align: center;
       line-height: 30px;
       padding-top: 30px;
+      .color-b1 {
+        color: #b7135d;
+      }
     }
     .overtext {
       margin: 15px 0;
@@ -156,23 +159,18 @@
       width: auto;
       top: 0;
       left: 0;
-      margin-left:0;
+      margin-left: 0;
       margin-top: 0;
-      .l-head{
+      .l-head {
         padding: 20px 10px;
+        background-color: #fbfdfe;
       }
       .l-form {
-
-        //text-align: left;
-        //background-color: #fbfdfe;
-        //border-bottom-left-radius: 3px;
-        //border-bottom-right-radius: 3px;
         padding: 25px 20px;
+        background-color: #fbfdfe;
       }
     }
   }
-
-
 }
 /*
 * Content Account END
