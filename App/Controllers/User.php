@@ -131,14 +131,16 @@ class User extends \Core\Controller
                 return false;
             }
 
-            // TODO: Create a remember me cookie if the user has selected the option
-            // to remained logged in on the login form.
-            // https://github.com/andrewdyer/php-mvc-register-login/blob/development/www/app/Model/UserLogin.php#L86
-
+            // Créer la session utilisateur
             $_SESSION['user'] = array(
                 'id' => $user['id'],
                 'username' => $user['username'],
             );
+
+            // Créer un cookie "se souvenir de moi" si l'option est cochée
+            if (isset($data['remember_me']) && $data['remember_me'] == '1') {
+                $this->createRememberMeCookie($user['id']);
+            }
 
             return true;
 
@@ -148,6 +150,81 @@ class User extends \Core\Controller
             error_log("Erreur de login: " . $ex->getMessage());
             return false;
         }
+    }
+
+    /**
+     * Créer un cookie "se souvenir de moi" sécurisé
+     */
+    private function createRememberMeCookie($userId) {
+        // Générer un token aléatoire sécurisé
+        $token = bin2hex(random_bytes(32));
+        
+        // Hasher le token pour le stocker en base
+        $hashedToken = hash('sha256', $token);
+        
+        // Durée de vie du cookie (30 jours)
+        $expiry = time() + (30 * 24 * 60 * 60);
+        
+        // Stocker le token hashé en base de données avec l'ID utilisateur et l'expiration
+        \App\Models\User::saveRememberToken($userId, $hashedToken, $expiry);
+        
+        // Créer le cookie sécurisé
+        setcookie(
+            'remember_me', 
+            $userId . ':' . $token, 
+            $expiry, 
+            '/', 
+            '', 
+            isset($_SERVER['HTTPS']), // Secure flag si HTTPS
+            true // HttpOnly flag
+        );
+    }
+
+    /**
+     * Vérifier et traiter un cookie "se souvenir de moi"
+     */
+    public function checkRememberMeCookie() {
+        if (!isset($_COOKIE['remember_me'])) {
+            return false;
+        }
+
+        $cookieParts = explode(':', $_COOKIE['remember_me'], 2);
+        if (count($cookieParts) !== 2) {
+            $this->clearRememberMeCookie();
+            return false;
+        }
+
+        $userId = $cookieParts[0];
+        $token = $cookieParts[1];
+        $hashedToken = hash('sha256', $token);
+
+        // Vérifier le token en base
+        $storedToken = \App\Models\User::getRememberToken($userId);
+        
+        if (!$storedToken || $storedToken['token'] !== $hashedToken || $storedToken['expiry'] < time()) {
+            $this->clearRememberMeCookie();
+            return false;
+        }
+
+        // Token valide, connecter l'utilisateur
+        $user = \App\Models\User::getById($userId);
+        if ($user) {
+            $_SESSION['user'] = array(
+                'id' => $user['id'],
+                'username' => $user['username'],
+            );
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Supprimer le cookie "se souvenir de moi"
+     */
+    private function clearRememberMeCookie() {
+        setcookie('remember_me', '', time() - 3600, '/');
+        unset($_COOKIE['remember_me']);
     }
 
 
@@ -160,13 +237,15 @@ class User extends \Core\Controller
      */
     public function logoutAction() {
 
-        /*
-        if (isset($_COOKIE[$cookie])){
-            // TODO: Delete the users remember me cookie if one has been stored.
-            // https://github.com/andrewdyer/php-mvc-register-login/blob/development/www/app/Model/UserLogin.php#L148
-        }*/
-        // Destroy all data registered to the session.
+        // Supprimer le token "remember me" de la base de données si l'utilisateur est connecté
+        if (isset($_SESSION['user']['id'])) {
+            \App\Models\User::cleanRememberTokensForUser($_SESSION['user']['id']);
+        }
 
+        // Supprimer le cookie "remember me"
+        $this->clearRememberMeCookie();
+
+        // Destroy all data registered to the session.
         $_SESSION = array();
 
         if (ini_get("session.use_cookies")) {
