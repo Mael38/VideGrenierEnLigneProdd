@@ -47,12 +47,32 @@ class User extends \Core\Controller
 
             if($f['password'] !== $f['password-check']){
                 // TODO: Gestion d'erreur côté utilisateur
+                View::renderTemplate('User/register.html', [
+                    'error' => 'Les mots de passe ne correspondent pas'
+                ]);
+                return;
             }
 
             // validation
 
-            $this->register($f);
-            // TODO: Rappeler la fonction de login pour connecter l'utilisateur
+            $userID = $this->register($f);
+            
+            if ($userID) {
+                // Connecter automatiquement l'utilisateur après inscription
+                $loginSuccess = $this->login($f);
+                
+                if ($loginSuccess) {
+                    // Rediriger vers le compte utilisateur
+                    header('Location: /account');
+                    return;
+                }
+            }
+            
+            // En cas d'erreur, afficher le formulaire avec un message d'erreur
+            View::renderTemplate('User/register.html', [
+                'error' => 'Erreur lors de l\'inscription. Veuillez réessayer.'
+            ]);
+            return;
         }
 
         View::renderTemplate('User/register.html');
@@ -98,10 +118,14 @@ class User extends \Core\Controller
     private function login($data){
         try {
             if(!isset($data['email'])){
-                throw new Exception('TODO');
+                throw new Exception('Email manquant');
             }
 
             $user = \App\Models\User::getByLogin($data['email']);
+            
+            if (!$user) {
+                return false;
+            }
 
             if (Hash::generate($data['password'], $user['salt']) !== $user['password']) {
                 return false;
@@ -121,6 +145,8 @@ class User extends \Core\Controller
         } catch (Exception $ex) {
             // TODO : Set flash if error
             /* Utility\Flash::danger($ex->getMessage());*/
+            error_log("Erreur de login: " . $ex->getMessage());
+            return false;
         }
     }
 
