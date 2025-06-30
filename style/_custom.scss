@@ -85,7 +85,7 @@ label.checkbox {
   height: 20px;
   cursor: pointer;
   background-color: $c-white;
-  @media only screen and(max-width: 767px) {
+  @media only screen and (max-width: 767px) {
     width: 24px;
     height: 24px;
     border-radius: 4px;
@@ -99,7 +99,7 @@ label.checkbox {
     left: -1px;
     border: solid 1px $c-active;
     border-radius: 2px;
-    @media only screen and(max-width: 767px) {
+    @media only screen and (max-width: 767px) {
       width: 24px;
       height: 24px;
       border-radius: 4px;
@@ -115,7 +115,7 @@ label.checkbox {
       border-top: solid 2px $c-active;
       border-right: solid 2px $c-active;
       @include rotate(135deg);
-      @media only screen and(max-width: 767px) {
+      @media only screen and (max-width: 767px) {
         width: 10px;
         height: 6px;
         top: 6px;
@@ -172,8 +172,8 @@ input,
 select,
 textarea {
   &:focus {
-    -webkit-box-shadow: none !important;
-    moz-box-shadow: none !important;
+    --webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
     box-shadow: none !important;
     outline: none !important;
   }
@@ -266,7 +266,7 @@ ul.list-inline {
 //TAGS
 .tags-type1,
 .tags-type2 {
-  fond-size: 0;
+  font-size: 0;
   display: table;
   a {
     display: inline-block;
