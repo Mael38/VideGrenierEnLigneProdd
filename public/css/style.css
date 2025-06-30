@@ -394,15 +394,6 @@ label.clipboard:hover .btn-copy {
   color: white;
 }
 
-.login-window input {
-  height: 46px;
-  padding-top: 18px;
-}
-.login-window button {
-  padding-top: 22px;
-  padding-bottom: 16px;
-}
-
 input:focus,
 select:focus,
 textarea:focus {
@@ -664,10 +655,20 @@ video {
 
 .login-window div.checkbox > label {
   padding-left: 40px;
+  position: relative;
 }
 .login-window label.checkbox {
   position: absolute;
   margin-left: -40px;
+  margin-top: 0;
+}
+.login-window input,
+.login-window select {
+  height: 46px;
+}
+.login-window button {
+  padding-top: 16px;
+  padding-bottom: 12px;
 }
 
 .u-form div.checkbox label.checkbox {
@@ -751,6 +752,73 @@ video {
   height: 100%;
 }
 
+.bg-image {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+}
+
+.login-wraper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+@media (max-width: 1365px) {
+  .login-wraper {
+    flex-direction: column;
+  }
+}
+
+.banner-text {
+  z-index: 1;
+}
+.banner-text .b-text {
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+.banner-text .b-text .color-active {
+  color: #ff6b6b;
+}
+.banner-text .b-text .color-b1 {
+  color: #4ecdc4;
+}
+
+.checkbox {
+  position: relative;
+  display: block;
+  margin-bottom: 20px;
+}
+.checkbox label {
+  display: flex;
+  align-items: flex-start;
+  cursor: pointer;
+}
+.checkbox label span {
+  margin-left: 10px;
+  line-height: 1.4;
+}
+.checkbox label .text2 {
+  font-size: 12px;
+  color: #6c757d;
+  display: block;
+  margin-top: 5px;
+}
+.checkbox label.checkbox {
+  flex-shrink: 0;
+  margin: 0;
+  margin-top: 2px;
+}
+
+@media (max-width: 767px) {
+  .login-window .l-form {
+    padding: 20px 15px !important;
+  }
+  .login-window .checkbox label {
+    font-size: 14px;
+  }
+}
 /*
 * Content Index
 */
@@ -2179,6 +2247,9 @@ footer .f-lang .btn-default {
     line-height: 30px;
     padding-top: 30px;
   }
+  .banner-text .b-text .color-b1 {
+    color: #b7135d;
+  }
   .banner-text .overtext {
     margin: 15px 0;
     color: #a1a1a1;
@@ -2194,9 +2265,11 @@ footer .f-lang .btn-default {
   }
   .login-wraper .login-window .l-head {
     padding: 20px 10px;
+    background-color: #fbfdfe;
   }
   .login-wraper .login-window .l-form {
     padding: 25px 20px;
+    background-color: #fbfdfe;
   }
 }
 /*
