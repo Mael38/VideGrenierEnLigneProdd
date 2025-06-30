@@ -29,9 +29,12 @@ class Product extends \Core\Controller
                 $f['user_id'] = $_SESSION['user']['id'];
                 $id = Articles::save($f);
 
-                $pictureName = Upload::uploadFile($_FILES['picture'], $id);
-
-                Articles::attachPicture($id, $pictureName);
+                // Vérifier si un fichier a été uploadé
+                if (isset($_FILES['picture']) && $_FILES['picture']['error'] === UPLOAD_ERR_OK && !empty($_FILES['picture']['tmp_name'])) {
+                    $pictureName = Upload::uploadFile($_FILES['picture'], $id);
+                    Articles::attachPicture($id, $pictureName);
+                }
+                // Si pas de fichier, continuer sans image (l'image est optionnelle)
 
                 header('Location: /product/' . $id);
             } catch (\Exception $e){

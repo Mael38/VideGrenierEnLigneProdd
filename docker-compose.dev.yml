@@ -2,7 +2,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: dev-web
     ports:
       - "8080:80"
@@ -12,6 +12,8 @@ services:
     environment:
       - APACHE_DOCUMENT_ROOT=/var/www/html/public
       - PHP_INI_DIR=/usr/local/etc/php
+    env_file:
+      - .env.dev
     restart: always
     depends_on:
       - db
@@ -22,11 +24,11 @@ services:
     ports:
       - "3307:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: 653rag9T
-      MYSQL_DATABASE: videgrenierenligne
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mysql_data_dev:/var/lib/mysql
       - ./sql/import.sql:/docker-entrypoint-initdb.d/import.sql
 
 volumes:
-  mysql_data:
+  mysql_data_dev:

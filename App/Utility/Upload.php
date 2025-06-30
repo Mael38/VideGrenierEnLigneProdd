@@ -7,9 +7,17 @@ class Upload {
 
     public static function uploadFile($file, $fileName)
     {
+        // Vérifier si le fichier a été correctement uploadé
+        if (!isset($file['tmp_name']) || empty($file['tmp_name'])) {
+            throw new \Exception("Aucun fichier n'a été uploadé");
+        }
+
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            throw new \Exception("Erreur lors de l'upload du fichier: " . $file['error']);
+        }
+
         $currentDirectory = getcwd();
         $uploadDirectory = "/storage/";
-
 
         $fileExtensionsAllowed = ['jpeg', 'jpg', 'png'];
 
@@ -18,7 +26,6 @@ class Upload {
 
         $fileExtension = pathinfo($file['name'], PATHINFO_EXTENSION);
         $pictureName = basename($fileName . '.'. $fileExtension);
-
 
         $uploadPath = $currentDirectory . $uploadDirectory . $pictureName;
 

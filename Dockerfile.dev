@@ -1,0 +1,57 @@
+FROM php:8.3.0-apache   
+
+# Installation des extensions et outils nécessaires
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    zip \
+    unzip \
+    git \
+    curl \
+    && docker-php-ext-install zip pdo pdo_mysql
+
+# Activation du module rewrite d'Apache
+RUN a2enmod rewrite
+
+# Installation de Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Configuration PHP pour le développement
+RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+
+# Configuration pour activer les erreurs en développement
+RUN echo "display_errors = On" >> "$PHP_INI_DIR/php.ini" \
+    && echo "error_reporting = E_ALL" >> "$PHP_INI_DIR/php.ini" \
+    && echo "log_errors = On" >> "$PHP_INI_DIR/php.ini"
+
+WORKDIR /var/www/html
+
+# Copie des fichiers de configuration
+COPY composer.json composer.lock ./
+
+# Installation des dépendances
+RUN composer install --no-scripts --no-autoloader
+
+# Copie de tout le code source
+COPY . .
+
+# Génération de l'autoloader optimisé
+RUN composer dump-autoload --optimize
+
+# Configuration des permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
+
+# Configuration Apache pour pointer vers /public
+RUN sed -i -e 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
+    && echo "DocumentRoot /var/www/html/public" >> /etc/apache2/apache2.conf \
+    && echo "<Directory /var/www/html/public>" >> /etc/apache2/apache2.conf \
+    && echo "    AllowOverride All" >> /etc/apache2/apache2.conf \
+    && echo "    Require all granted" >> /etc/apache2/apache2.conf \
+    && echo "</Directory>" >> /etc/apache2/apache2.conf
+
+# Création du dossier uploads avec permissions
+RUN mkdir -p /var/www/html/public/storage \
+    && chown -R www-data:www-data /var/www/html/public/storage \
+    && chmod -R 755 /var/www/html/public/storage
+
+EXPOSE 80
