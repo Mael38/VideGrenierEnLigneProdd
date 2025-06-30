@@ -1,0 +1,436 @@
+openapi: 3.0.3
+info:
+  title: API Vide Grenier en Ligne
+  description: |
+    API REST pour l'application Vide Grenier en Ligne.
+    Cette API permet de gérer les annonces, les utilisateurs et les interactions de l'application.
+    
+    ## Authentification
+    L'API utilise un système de sessions PHP. Certaines routes nécessitent une authentification.
+    
+    ## Codes d'erreur
+    - 200: Succès
+    - 400: Erreur de validation des données
+    - 401: Non authentifié
+    - 403: Accès refusé
+    - 404: Ressource non trouvée
+    - 500: Erreur serveur
+    
+  version: "1.0.0"
+  contact:
+    name: Support Vide Grenier
+    email: support@videgrenier.local
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8080
+    description: Serveur de développement
+  - url: http://localhost
+    description: Serveur de production
+
+tags:
+  - name: Articles
+    description: Gestion des annonces/articles
+  - name: Utilisateurs
+    description: Gestion des utilisateurs
+  - name: Villes
+    description: Recherche de villes
+  - name: Contact
+    description: Formulaire de contact
+
+paths:
+  /api/products:
+    get:
+      tags:
+        - Articles
+      summary: Liste des articles
+      description: Récupère la liste de tous les articles avec possibilité de tri
+      parameters:
+        - name: sort
+          in: query
+          description: Critère de tri (views, date)
+          required: false
+          schema:
+            type: string
+            enum: [views, date]
+            default: ""
+          example: views
+      responses:
+        '200':
+          description: Liste des articles récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Article'
+              example:
+                - id: 1
+                  name: "Vélo de course vintage"
+                  description: "Magnifique vélo de course des années 80"
+                  price: 150.00
+                  picture: "1.jpeg"
+                  views: 42
+                  date_created: "2024-01-15"
+                  username: "cycliste92"
+                  city: "Paris"
+        '500':
+          description: Erreur serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/cities:
+    get:
+      tags:
+        - Villes
+      summary: Recherche de villes
+      description: Recherche de villes par nom pour l'autocomplétion
+      parameters:
+        - name: query
+          in: query
+          description: Terme de recherche pour filtrer les villes
+          required: true
+          schema:
+            type: string
+            minLength: 2
+          example: "Par"
+      responses:
+        '200':
+          description: Liste des villes trouvées
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/City'
+              example:
+                - id: 1
+                  name: "Paris"
+                  postal_code: "75000"
+                - id: 2
+                  name: "Paray-le-Monial"
+                  postal_code: "71600"
+        '400':
+          description: Paramètre de recherche manquant ou invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user/register:
+    post:
+      tags:
+        - Utilisateurs
+      summary: Inscription d'un nouvel utilisateur
+      description: Crée un nouveau compte utilisateur et connecte automatiquement l'utilisateur
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - username
+                - email
+                - password
+                - city
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 50
+                  example: "nouvel_utilisateur"
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+                password:
+                  type: string
+                  minLength: 6
+                  example: "motdepasse123"
+                city:
+                  type: string
+                  example: "Paris"
+      responses:
+        '302':
+          description: Inscription réussie, redirection vers la page d'accueil
+        '400':
+          description: Erreur de validation des données
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /user/login:
+    post:
+      tags:
+        - Utilisateurs
+      summary: Connexion utilisateur
+      description: Authentifie un utilisateur avec gestion du "se souvenir de moi"
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "user@example.com"
+                password:
+                  type: string
+                  example: "motdepasse123"
+                remember_me:
+                  type: string
+                  enum: ["1"]
+                  description: "Cocher pour se souvenir de moi"
+      responses:
+        '302':
+          description: Connexion réussie, redirection vers la page d'accueil
+        '400':
+          description: Identifiants incorrects
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /user/logout:
+    get:
+      tags:
+        - Utilisateurs
+      summary: Déconnexion utilisateur
+      description: Déconnecte l'utilisateur et supprime les tokens de session
+      security:
+        - SessionAuth: []
+      responses:
+        '302':
+          description: Déconnexion réussie, redirection vers la page d'accueil
+
+  /product/add:
+    post:
+      tags:
+        - Articles
+      summary: Ajout d'un nouvel article
+      description: Crée une nouvelle annonce avec upload d'image optionnel
+      security:
+        - SessionAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - name
+                - description
+                - price
+                - city
+              properties:
+                name:
+                  type: string
+                  maxLength: 100
+                  example: "Vélo vintage"
+                description:
+                  type: string
+                  maxLength: 1000
+                  example: "Magnifique vélo de collection"
+                price:
+                  type: number
+                  format: float
+                  minimum: 0
+                  example: 150.50
+                city:
+                  type: string
+                  example: "Paris"
+                picture:
+                  type: string
+                  format: binary
+                  description: "Image de l'article (optionnel)"
+      responses:
+        '302':
+          description: Article créé avec succès, redirection vers la liste
+        '400':
+          description: Erreur de validation des données
+        '401':
+          description: Utilisateur non authentifié
+
+  /product/{id}/contact:
+    post:
+      tags:
+        - Contact
+      summary: Contacter le vendeur
+      description: Envoie un message au vendeur d'un article
+      parameters:
+        - name: id
+          in: path
+          description: ID de l'article
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - subject
+                - message
+              properties:
+                name:
+                  type: string
+                  maxLength: 100
+                  example: "Jean Dupont"
+                email:
+                  type: string
+                  format: email
+                  example: "jean@example.com"
+                subject:
+                  type: string
+                  maxLength: 200
+                  example: "Intéressé par votre vélo"
+                message:
+                  type: string
+                  maxLength: 1000
+                  example: "Bonjour, je suis intéressé par votre annonce..."
+      responses:
+        '200':
+          description: Message envoyé avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Message envoyé avec succès"
+        '400':
+          description: Erreur de validation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Article non trouvé
+
+components:
+  schemas:
+    Article:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID unique de l'article
+          example: 1
+        name:
+          type: string
+          description: Nom de l'article
+          example: "Vélo de course vintage"
+        description:
+          type: string
+          description: Description détaillée
+          example: "Magnifique vélo de course des années 80"
+        price:
+          type: number
+          format: float
+          description: Prix en euros
+          example: 150.00
+        picture:
+          type: string
+          description: Nom du fichier image
+          example: "1.jpeg"
+        views:
+          type: integer
+          description: Nombre de vues
+          example: 42
+        date_created:
+          type: string
+          format: date
+          description: Date de création
+          example: "2024-01-15"
+        username:
+          type: string
+          description: Nom d'utilisateur du vendeur
+          example: "cycliste92"
+        city:
+          type: string
+          description: Ville de l'annonce
+          example: "Paris"
+    
+    City:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID unique de la ville
+          example: 1
+        name:
+          type: string
+          description: Nom de la ville
+          example: "Paris"
+        postal_code:
+          type: string
+          description: Code postal
+          example: "75000"
+    
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID unique de l'utilisateur
+          example: 1
+        username:
+          type: string
+          description: Nom d'utilisateur
+          example: "cycliste92"
+        email:
+          type: string
+          format: email
+          description: Adresse email
+          example: "user@example.com"
+        city:
+          type: string
+          description: Ville de l'utilisateur
+          example: "Paris"
+        date_created:
+          type: string
+          format: date-time
+          description: Date de création du compte
+          example: "2024-01-15T10:30:00Z"
+    
+    Error:
+      type: object
+      properties:
+        error:
+          type: boolean
+          example: true
+        message:
+          type: string
+          description: Message d'erreur
+          example: "Une erreur est survenue"
+        code:
+          type: integer
+          description: Code d'erreur HTTP
+          example: 400
+
+  securitySchemes:
+    SessionAuth:
+      type: apiKey
+      in: cookie
+      name: PHPSESSID
+      description: Authentification par session PHP

@@ -1,0 +1,68 @@
+FROM php:8.3.0-apache
+
+# Installation des extensions et outils nécessaires pour la production
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    zip \
+    unzip \
+    && docker-php-ext-install zip pdo pdo_mysql \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Activation du module rewrite d'Apache
+RUN a2enmod rewrite
+
+# Installation de Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Configuration PHP pour la production
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
+# Configuration pour la production (erreurs désactivées côté client)
+RUN echo "display_errors = Off" >> "$PHP_INI_DIR/php.ini" \
+    && echo "log_errors = On" >> "$PHP_INI_DIR/php.ini" \
+    && echo "error_log = /var/log/php_errors.log" >> "$PHP_INI_DIR/php.ini" \
+    && echo "memory_limit = 256M" >> "$PHP_INI_DIR/php.ini" \
+    && echo "upload_max_filesize = 10M" >> "$PHP_INI_DIR/php.ini" \
+    && echo "post_max_size = 12M" >> "$PHP_INI_DIR/php.ini"
+
+WORKDIR /var/www/html
+
+# Copie des fichiers de configuration
+COPY composer.json composer.lock ./
+
+# Installation des dépendances en mode production (sans dev)
+RUN composer install --no-dev --optimize-autoloader --no-scripts
+
+# Copie de tout le code source
+COPY . .
+
+# Génération de l'autoloader optimisé pour la production
+RUN composer dump-autoload --optimize --classmap-authoritative
+
+# Configuration des permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html \
+    && chmod -R 777 /var/www/html/public/storage \
+    && chmod -R 755 /var/www/html/logs
+
+# Configuration Apache pour pointer vers /public
+RUN sed -i -e 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
+    && echo "DocumentRoot /var/www/html/public" >> /etc/apache2/apache2.conf \
+    && echo "<Directory /var/www/html/public>" >> /etc/apache2/apache2.conf \
+    && echo "    AllowOverride All" >> /etc/apache2/apache2.conf \
+    && echo "    Require all granted" >> /etc/apache2/apache2.conf \
+    && echo "</Directory>" >> /etc/apache2/apache2.conf
+
+# Sécurisation pour la production
+RUN echo "ServerTokens Prod" >> /etc/apache2/apache2.conf \
+    && echo "ServerSignature Off" >> /etc/apache2/apache2.conf
+
+# Point d'entrée personnalisé pour la production
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+EXPOSE 80
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["apache2-foreground"]
