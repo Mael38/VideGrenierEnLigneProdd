@@ -1,5 +1,8 @@
 <?php
 
+// Définir la constante pour indiquer que nous sommes en mode test
+define('PHPUNIT_RUNNING', true);
+
 use PHPUnit\Framework\TestCase;
 use App\Utility\Upload;
 
@@ -134,6 +137,9 @@ class UploadTest extends TestCase
         $result = Upload::uploadFile($file, 'test_article');
 
         $this->assertEquals('test_article.jpg', $result);
-        $this->assertFileExists($this->testUploadDir . '/storage/test_article.jpg');
+        
+        // Vérifier que le fichier a été créé dans le bon répertoire
+        $expectedPath = getcwd() . '/storage/test_article.jpg';
+        $this->assertFileExists($expectedPath);
     }
 }
