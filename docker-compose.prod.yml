@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile.prod
     container_name: vide-grenier-web-prod
     ports:
-      - "8080:80"
+      - "8082:80"
     environment:
       - DB_HOST=db
       - DB_NAME=videgrenierenligne
@@ -36,7 +36,7 @@ services:
       - mysql_data_prod:/var/lib/mysql
       - ./sql/import.sql:/docker-entrypoint-initdb.d/import.sql
     ports:
-      - "3306:3306"
+      - "3309:3306"
     restart: unless-stopped
     networks:
       - vide-grenier-network
