@@ -2,12 +2,140 @@
 
 {% block title %}Connexion{% endblock %}
 
+{% block head %}
+<style>
+    .login-wraper {
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        background-color: #f5f5f5;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        display: flex;
+    }
+    
+    .login-wraper .hidden-xs {
+        flex: 1;
+    }
+    
+    .login-wraper .hidden-xs img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .login-window {
+        flex: 1;
+        background: white;
+        padding: 20px;
+        position: relative !important;
+        margin: 0 !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+    }
+    
+    .banner-text {
+        position: absolute;
+        top: 100px;
+        left: 50px;
+        color: white;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        text-align: left;
+    }
+    
+    .banner-text .color-active {
+        color: #ea2c5a;
+    }
+    
+    .banner-text .color-b1 {
+        color: #84d4e6;
+    }
+    
+    .bg-image {
+        background-color: #f9f9f9;
+        padding: 30px 0;
+    }
+    
+    @media (max-width: 768px) {
+        .login-wraper {
+            flex-direction: column;
+        }
+        
+        .login-window {
+            width: 100% !important;
+        }
+    }
+    
+    /* Style pour le checkbox personnalisé */
+    .custom-checkbox {
+        margin: 15px 0;
+    }
+    
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        font-weight: normal;
+    }
+    
+    .checkbox-custom {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        background: #fff;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        margin-right: 10px;
+        position: relative;
+    }
+    
+    input[type="checkbox"] {
+        opacity: 0;
+        position: absolute;
+    }
+    
+    input[type="checkbox"]:checked + .checkbox-custom:after {
+        content: '';
+        position: absolute;
+        width: 10px;
+        height: 5px;
+        border-left: 2px solid #ea2c5a;
+        border-bottom: 2px solid #ea2c5a;
+        top: 4px;
+        left: 3px;
+        transform: rotate(-45deg);
+    }
+    
+    .help-text {
+        margin-left: 28px;
+        font-size: 12px;
+        color: #888;
+    }
+    
+    .btn-cv1 {
+        background: #ea2c5a;
+        color: white;
+        border: none;
+        padding: 8px 25px;
+        border-radius: 3px;
+        font-weight: 500;
+    }
+    
+    .btn-cv1:hover {
+        background: #c4204a;
+        color: white;
+    }
+</style>
+{% endblock %}
+
 {% block body %}
 <div class="container-fluid bg-image">
     <div class="row">
         <div class="login-wraper">
             <div class="hidden-xs">
-                <img src="images/login.jpg" alt="">
+                <img src="/images/account.jpg" alt="">
             </div>
             <div class="banner-text hidden-xs">
                 <div class="line"></div>
@@ -32,14 +160,15 @@
                             <input type="password" class="form-control" id="exampleInputPassword1"
                                    name="password" placeholder="**********">
                         </div>
-                        <div class="checkbox">
-                            <label>
-                                <label class="checkbox">
-                                    <input type="checkbox" name="remember_me" value="1">
-                                    <span class="arrow"></span>
-                                </label> <span>Se souvenir de moi</span>
-                                <span class="text2">(non recommandé si vous êtes sur un ordinateur partagé)</span>
-                            </label>
+                        <div class="form-group">
+                            <div class="custom-checkbox">
+                                <label for="remember-me" class="checkbox-label">
+                                    <input type="checkbox" id="remember-me" name="remember_me" value="1" aria-label="Se souvenir de moi">
+                                    <span class="checkbox-custom"></span>
+                                    Se souvenir de moi
+                                </label>
+                                <p class="help-text">(non recommandé si vous êtes sur un ordinateur partagé)</p>
+                            </div>
                         </div>
                         <div class="row">
                             <div
