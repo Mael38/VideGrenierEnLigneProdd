@@ -27,6 +27,9 @@ echo ==============================================
 echo  DEV  : http://localhost:8081
 echo  PROD : http://localhost:8082
 echo ==============================================
+echo  DB DEV  : localhost:3308
+echo  DB PROD : localhost:3309
+echo ==============================================
 
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
