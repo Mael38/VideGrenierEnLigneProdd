@@ -1,11 +1,11 @@
 services:
-  web:
+  dev_web:
     build:
       context: .
       dockerfile: Dockerfile.dev
     container_name: dev-web
     ports:
-      - "8080:80"
+      - "8081:80"
     volumes:
       - ./:/var/www/html
       - ./public:/var/www/html/public
@@ -16,19 +16,29 @@ services:
       - .env.dev
     restart: always
     depends_on:
-      - db
+      - dev_db
+    networks:
+      - vide-grenier-dev-network
 
-  db:
+  dev_db:
     image: mysql:8.0
     container_name: dev-db
     ports:
-      - "3307:3306"
+      - "3308:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: 653rag9T
+      MYSQL_DATABASE: videgrenierenligne
+      MYSQL_USER: videgrenier  
+      MYSQL_PASSWORD: 653rag9T
     volumes:
       - mysql_data_dev:/var/lib/mysql
       - ./sql/import.sql:/docker-entrypoint-initdb.d/import.sql
+    networks:
+      - vide-grenier-dev-network
 
 volumes:
   mysql_data_dev:
+
+networks:
+  vide-grenier-dev-network:
+    driver: bridge

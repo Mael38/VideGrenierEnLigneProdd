@@ -59,10 +59,9 @@ RUN echo "ServerTokens Prod" >> /etc/apache2/apache2.conf \
     && echo "ServerSignature Off" >> /etc/apache2/apache2.conf
 
 # Point d'entrée personnalisé pour la production
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh && chmod +x /usr/local/bin/docker-entrypoint.sh
 
 EXPOSE 80
 
-ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
