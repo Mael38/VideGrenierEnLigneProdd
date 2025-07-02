@@ -18,6 +18,7 @@ services:
     volumes:
       - ./public/storage:/var/www/html/public/storage
       - ./logs:/var/www/html/logs
+      - ./docs:/var/www/html/public/docs
     depends_on:
       - db
     restart: unless-stopped
