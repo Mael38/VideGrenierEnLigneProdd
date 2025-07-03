@@ -8,13 +8,11 @@ services:
     container_name: vide-grenier-web
     ports:
       - "8080:80"
+    env_file:
+      - ./prod.env
     environment:
-      - DB_HOST=db
-      - DB_NAME=videgrenierenligne
-      - DB_USER=root
-      - DB_PASSWORD=653rag9T
-      - SHOW_ERRORS=false
-      - ENVIRONMENT=production
+      - APACHE_DOCUMENT_ROOT=/var/www/html/public
+      - PHP_INI_DIR=/usr/local/etc/php
     volumes:
       - ./public/storage:/var/www/html/public/storage
       - ./logs:/var/www/html/logs
@@ -29,11 +27,13 @@ services:
     container_name: vide-grenier-db
     ports:
       - "3307:3306"
+    env_file:
+      - ./prod.env
     environment:
-      MYSQL_ROOT_PASSWORD: 653rag9T
-      MYSQL_DATABASE: videgrenierenligne
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
       MYSQL_USER: videgrenier
-      MYSQL_PASSWORD: 653rag9T
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
       - ./sql/import.sql:/docker-entrypoint-initdb.d/import.sql

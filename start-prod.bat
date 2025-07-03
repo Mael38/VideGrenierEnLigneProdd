@@ -1,7 +1,7 @@
 @echo off
 echo === Demarrage de l'environnement de PRODUCTION Vide Grenier en Ligne ===
-echo Port: 80
-echo Base de donnees: port 3306
+echo Port: 8082
+echo Base de donnees: port 3309
 echo.
 
 REM Verification que Docker est installe
@@ -38,8 +38,8 @@ docker-compose -f docker-compose.prod.yml ps
 
 echo.
 echo === Environnement de PRODUCTION demarre ===
-echo 🌐 Application: http://localhost
-echo 🗄️  Base de donnees: localhost:3306
+echo 🌐 Application: http://localhost:8082
+echo 🗄️  Base de donnees: localhost:3309
 echo.
 echo 📝 Commandes utiles:
 echo    Voir les logs: docker-compose -f docker-compose.prod.yml logs -f
