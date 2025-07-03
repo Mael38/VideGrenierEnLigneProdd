@@ -12,8 +12,12 @@ services:
     environment:
       - APACHE_DOCUMENT_ROOT=/var/www/html/public
       - PHP_INI_DIR=/usr/local/etc/php
-    env_file:
-      - .env.dev
+      - DB_HOST=dev_db
+      - DB_NAME=videgrenierenligne
+      - DB_USER=root
+      - DB_PASSWORD=653rag9T
+      - SHOW_ERRORS=true
+      - ENVIRONMENT=development
     restart: always
     depends_on:
       - dev_db
@@ -35,6 +39,7 @@ services:
       - ./sql/import.sql:/docker-entrypoint-initdb.d/import.sql
     networks:
       - vide-grenier-dev-network
+    command: --default-authentication-plugin=mysql_native_password
 
 volumes:
   mysql_data_dev:
