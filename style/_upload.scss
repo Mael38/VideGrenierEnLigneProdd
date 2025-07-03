@@ -124,7 +124,7 @@
         margin-bottom: 0;
         height: 8px;
         background-color: $c-divider;
-        --webkit-box-shadow: none;
+        ---webkit-box-shadow: none;
         box-shadow: none;
         @media only screen and (max-width: 767px) {
           width: 100%;

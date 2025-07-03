@@ -147,18 +147,18 @@ label {
 }
 
 .btn-group.open .dropdown-toggle {
-  --webkit-box-shadow: none;
+  ---webkit-box-shadow: none;
   box-shadow: none;
 }
 
 .btn:active, .btn.active {
-  --webkit-box-shadow: none;
+  ---webkit-box-shadow: none;
   box-shadow: none;
 }
 
 .btn-default {
   color: $c-icon;
-  --webkit-box-shadow: none;
+  ---webkit-box-shadow: none;
   box-shadow: none;
 }
 
@@ -194,7 +194,7 @@ label {
 ul.dropdown-menu {
   border-color: $c-divider;
   border-radius: 0px;
-  --webkit-box-shadow: none;
+  ---webkit-box-shadow: none;
   box-shadow: none;
   padding: 0;
   margin: 0;

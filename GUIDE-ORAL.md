@@ -170,7 +170,7 @@ Production (port 80):
 # Générer la documentation Swagger
 generate-docs.bat
 
-# Ouvrir http://localhost:8080/docs/api/
+# Ouvrir http://localhost:8082/docs/api/
 ```
 
 ### Système d'issues
