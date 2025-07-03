@@ -2,6 +2,6 @@ vendor
 .idea
 composer.lock
 storage
-.env   
-.env.dev
-.env.prod
+dev.env
+prod.env
+.env
