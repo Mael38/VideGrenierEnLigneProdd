@@ -24,7 +24,7 @@ timeout /t 10 /nobreak
 
 REM Installation des dépendances si nécessaire
 echo 📚 Installation des dépendances...
-docker-compose -f docker-compose.dev.yml exec web composer install
+docker-compose -f docker-compose.dev.yml exec dev_web composer install
 
 REM Vérification que les services sont bien démarrés
 echo ✅ Vérification des services...
@@ -32,8 +32,8 @@ docker-compose -f docker-compose.dev.yml ps
 
 echo.
 echo 🎉 Environnement de développement démarré avec succès!
-echo 🌐 Application accessible sur: http://localhost:8080
-echo 🗄️  Base de données accessible sur: localhost:3307
+echo 🌐 Application accessible sur: http://localhost:8081
+echo 🗄️  Base de données accessible sur: localhost:3308
 echo 📋 Pour voir les logs: docker-compose -f docker-compose.dev.yml logs -f
 echo 🛑 Pour arrêter: docker-compose -f docker-compose.dev.yml down
 echo.
